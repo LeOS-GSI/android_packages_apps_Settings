@@ -49,7 +49,6 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.SystemClock;
 import android.os.SystemProperties;
-import android.os.UserManager;
 import android.provider.Settings;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
@@ -113,23 +112,6 @@ public class MobileNetworkUtils {
     // The following constants are used to draw signal icon.
     public static final int NO_CELL_DATA_TYPE_ICON = 0;
     public static final Drawable EMPTY_DRAWABLE = new ColorDrawable(Color.TRANSPARENT);
-
-    /**
-     * Return true if current user limited by UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS.
-     *
-     * Note: Guest user should have this restriction through
-     *       GuestTelephonyPreferenceController.java.
-     *       However, it's not help with those devices upgraded their software.
-     */
-    public static boolean isMobileNetworkUserRestricted(Context context) {
-        UserManager um = context.getSystemService(UserManager.class);
-        boolean disallow = false;
-        if (um != null) {
-            disallow = um.isGuestUser() || um.hasUserRestriction(
-                    UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS);
-        }
-        return disallow;
-    }
 
     /**
      * Returns if DPC APNs are enforced.
@@ -630,11 +612,10 @@ public class MobileNetworkUtils {
     }
 
     public static Drawable getSignalStrengthIcon(Context context, int level, int numLevels,
-            int iconType, boolean cutOut, boolean carrierNetworkChanged) {
+            int iconType, boolean cutOut) {
         final SignalDrawable signalDrawable = new SignalDrawable(context);
         signalDrawable.setLevel(
-                carrierNetworkChanged ? SignalDrawable.getCarrierChangeState(numLevels)
-                        : SignalDrawable.getState(level, numLevels, cutOut));
+                SignalDrawable.getState(level, numLevels, cutOut));
 
         // Make the network type drawable
         final Drawable networkDrawable =

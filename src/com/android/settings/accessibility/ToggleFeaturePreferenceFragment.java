@@ -833,7 +833,14 @@ public abstract class ToggleFeaturePreferenceFragment extends SettingsPreference
         if (mDialog == null || !mDialog.isShowing()) {
             return;
         }
-        AccessibilityDialogUtils.updateShortcutInDialog(getContext(), mDialog);
+
+        // Content in software shortcut need to be adjusted depend on the accessibility button
+        // mode status which can be changed in background.
+        final boolean valueChanged = mSavedAccessibilityFloatingMenuEnabled
+                != AccessibilityUtil.isFloatingMenuEnabled(getContext());
+        if (valueChanged) {
+            AccessibilityDialogUtils.updateSoftwareShortcutInDialog(getContext(), mDialog);
+        }
     }
 
     @VisibleForTesting

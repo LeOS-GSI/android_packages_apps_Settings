@@ -28,11 +28,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.PersistableBundle;
 import android.telephony.CarrierConfigManager;
-import android.telephony.ServiceState;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 
-import androidx.lifecycle.Lifecycle;
 import androidx.preference.SwitchPreference;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -63,10 +61,6 @@ public class AutoSelectPreferenceControllerTest {
     private CarrierConfigCache mCarrierConfigCache;
     @Mock
     private ProgressDialog mProgressDialog;
-    @Mock
-    private ServiceState mTestServiceState;
-    @Mock
-    private Lifecycle mLifecycle;
 
     private PersistableBundle mCarrierConfig;
     private AutoSelectPreferenceController mController;
@@ -94,16 +88,7 @@ public class AutoSelectPreferenceControllerTest {
         mController = new AutoSelectPreferenceController(mContext, "auto_select");
         mController.mProgressDialog = mProgressDialog;
         mController.mSwitchPreference = mSwitchPreference;
-        mController.init(mLifecycle, SUB_ID);
-        sleepAfterInit();
-    }
-
-    private void sleepAfterInit() {
-        try {
-            Thread.sleep(2000);
-        } catch (Exception e) {
-            fail("Sleep timeout " + e);
-        }
+        mController.init(SUB_ID);
     }
 
     @Test
@@ -126,8 +111,7 @@ public class AutoSelectPreferenceControllerTest {
 
     @Test
     public void updateState_isRoaming_enabled() {
-        when(mTelephonyManager.getServiceState()).thenReturn(mTestServiceState);
-        when(mTestServiceState.getRoaming()).thenReturn(true);
+        when(mTelephonyManager.getServiceState().getRoaming()).thenReturn(true);
 
         mController.updateState(mSwitchPreference);
 
@@ -136,8 +120,7 @@ public class AutoSelectPreferenceControllerTest {
 
     @Test
     public void updateState_notRoamingWithAutoSelectOn_disabled() {
-        when(mTelephonyManager.getServiceState()).thenReturn(mTestServiceState);
-        when(mTestServiceState.getRoaming()).thenReturn(false);
+        when(mTelephonyManager.getServiceState().getRoaming()).thenReturn(false);
         doReturn(OPERATOR_NAME).when(mTelephonyManager).getSimOperatorName();
 
         mController.updateState(mSwitchPreference);
@@ -153,34 +136,6 @@ public class AutoSelectPreferenceControllerTest {
         when(mCarrierConfigCache.getConfigForSubId(SUB_ID)).thenReturn(null);
 
         // Should not crash
-        mController.init(mLifecycle, SUB_ID);
-    }
-
-    @Test
-    public void updateUiAutoSelectValue_serviceStateGetIsManualSelection_isCheckedFalse() {
-        when(mTelephonyManager.getNetworkSelectionMode()).thenReturn(
-                TelephonyManager.NETWORK_SELECTION_MODE_AUTO);
-        when(mTestServiceState.getIsManualSelection()).thenReturn(true);
-        mController.init(mLifecycle, SUB_ID);
-        sleepAfterInit();
-
-        mController.updateUiAutoSelectValue(mTestServiceState);
-
-        assertThat(mController.isChecked()).isFalse();
-        assertThat(mSwitchPreference.isChecked()).isFalse();
-    }
-
-    @Test
-    public void updateUiAutoSelectValue_serviceStateGetIsAutoSelection_isCheckedTrue() {
-        when(mTelephonyManager.getNetworkSelectionMode()).thenReturn(
-                TelephonyManager.NETWORK_SELECTION_MODE_MANUAL);
-        when(mTestServiceState.getIsManualSelection()).thenReturn(false);
-        mController.init(mLifecycle, SUB_ID);
-        sleepAfterInit();
-
-        mController.updateUiAutoSelectValue(mTestServiceState);
-
-        assertThat(mController.isChecked()).isTrue();
-        assertThat(mSwitchPreference.isChecked()).isTrue();
+        mController.init(SUB_ID);
     }
 }

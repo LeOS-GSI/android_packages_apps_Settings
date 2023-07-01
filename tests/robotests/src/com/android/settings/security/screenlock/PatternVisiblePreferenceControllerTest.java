@@ -21,6 +21,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 
 import androidx.preference.SwitchPreference;
@@ -51,22 +52,24 @@ public class PatternVisiblePreferenceControllerTest {
         MockitoAnnotations.initMocks(this);
         mContext = RuntimeEnvironment.application;
         mController =
-                new PatternVisiblePreferenceController(mContext, TEST_USER_ID, mLockPatternUtils);
+            new PatternVisiblePreferenceController(mContext, TEST_USER_ID, mLockPatternUtils);
         mPreference = new SwitchPreference(mContext);
     }
 
     @Test
     public void isAvailable_lockSetToPattern_shouldReturnTrue() {
-        when(mLockPatternUtils.getCredentialTypeForUser(TEST_USER_ID))
-                .thenReturn(LockPatternUtils.CREDENTIAL_TYPE_PATTERN);
+        when(mLockPatternUtils.isSecure(TEST_USER_ID)).thenReturn(true);
+        when(mLockPatternUtils.getKeyguardStoredPasswordQuality(TEST_USER_ID))
+                .thenReturn(DevicePolicyManager.PASSWORD_QUALITY_SOMETHING);
 
         assertThat(mController.isAvailable()).isTrue();
     }
 
     @Test
     public void isAvailable_lockSetToPin_shouldReturnFalse() {
-        when(mLockPatternUtils.getCredentialTypeForUser(TEST_USER_ID)).thenReturn(
-                LockPatternUtils.CREDENTIAL_TYPE_PIN);
+        when(mLockPatternUtils.isSecure(TEST_USER_ID)).thenReturn(true);
+        when(mLockPatternUtils.getKeyguardStoredPasswordQuality(TEST_USER_ID))
+                .thenReturn(DevicePolicyManager.PASSWORD_QUALITY_NUMERIC);
 
         assertThat(mController.isAvailable()).isFalse();
     }

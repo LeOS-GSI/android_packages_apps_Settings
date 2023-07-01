@@ -18,8 +18,6 @@ package com.android.settings.privacy;
 
 import android.annotation.NonNull;
 import android.content.Context;
-import android.os.UserHandle;
-import android.os.UserManager;
 
 import com.android.settings.R;
 import com.android.settings.core.TogglePreferenceController;
@@ -44,15 +42,9 @@ public final class EnableContentCapturePreferenceController extends TogglePrefer
 
     @Override
     public int getAvailabilityStatus() {
-        if (!ContentCaptureUtils.isFeatureAvailable()
-                || ContentCaptureUtils.getServiceSettingsComponentName() != null) {
-            return UNSUPPORTED_ON_DEVICE;
-        }
-        if (UserManager.get(mContext).hasUserRestrictionForUser(
-                UserManager.DISALLOW_CONTENT_CAPTURE, UserHandle.of(UserHandle.myUserId()))) {
-            return DISABLED_FOR_USER;
-        }
-        return AVAILABLE;
+        boolean available = ContentCaptureUtils.isFeatureAvailable()
+                && ContentCaptureUtils.getServiceSettingsComponentName() == null;
+        return available ? AVAILABLE : UNSUPPORTED_ON_DEVICE;
     }
 
     @Override

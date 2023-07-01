@@ -138,9 +138,8 @@ public class ZenModeAddBypassingAppsPreferenceControllerTest {
 
         Preference pref = prefCaptor.getValue();
         assertThat(pref.getKey()).isEqualTo(
-                ZenModeAddBypassingAppsPreferenceController.getKey(
-                        appWithChannelsNoneBypassing.info.packageName,
-                        appWithChannelsNoneBypassing.info.uid));
+                ZenModeAllBypassingAppsPreferenceController.getKey(
+                        appWithChannelsNoneBypassing.info.packageName));
     }
 
     @Test
@@ -160,6 +159,6 @@ public class ZenModeAddBypassingAppsPreferenceControllerTest {
 
         Preference pref = prefCaptor.getValue();
         assertThat(pref.getKey()).isEqualTo(
-                ZenModeAddBypassingAppsPreferenceController.KEY_NO_APPS);
+                ZenModeAllBypassingAppsPreferenceController.KEY_NO_APPS);
     }
 }

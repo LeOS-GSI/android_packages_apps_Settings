@@ -61,7 +61,6 @@ import java.util.stream.Collectors;
 
 /**
  * The helper is for slice of carrier and non-Carrier, used by ProviderModelSlice.
- * TODO: Remove the class in U because Settings does not use slice anymore.
  */
 public class ProviderModelSliceHelper {
     private static final String TAG = "ProviderModelSlice";
@@ -141,7 +140,7 @@ public class ProviderModelSliceHelper {
             numLevels += 1;
         }
         return MobileNetworkUtils.getSignalStrengthIcon(mContext, level, numLevels,
-                NO_CELL_DATA_TYPE_ICON, false, false);
+                NO_CELL_DATA_TYPE_ICON, false);
     }
 
     /**

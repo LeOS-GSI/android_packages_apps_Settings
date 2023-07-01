@@ -137,10 +137,6 @@
 
         <uses-library android:name="org.apache.http.legacy" />
 
-        <property
-            android:name="android.window.PROPERTY_ACTIVITY_EMBEDDING_SPLITS_ENABLED"
-            android:value="true" />
-
         <!-- Settings -->
         <activity android:name=".homepage.SettingsHomepageActivity"
                   android:label="@string/settings_label_launcher"
@@ -2993,6 +2989,7 @@
         <activity android:name=".FallbackHome"
                   android:excludeFromRecents="true"
                   android:label=""
+                  android:screenOrientation="nosensor"
                   android:taskAffinity="com.android.settings.FallbackHome"
                   android:exported="true"
                   android:theme="@style/FallbackHome"
@@ -3428,7 +3425,7 @@
                   android:label="@string/notification_channel_title"
                   android:theme="@style/Theme.Panel"
                   android:excludeFromRecents="true"
-                  android:configChanges="keyboardHidden|screenSize"
+                  android:configChanges="orientation|keyboardHidden|screenSize"
                   android:exported="true">
             <intent-filter android:priority="1">
                 <action android:name="android.settings.CHANNEL_NOTIFICATION_SETTINGS" />
@@ -3949,7 +3946,7 @@
 
         <activity
             android:name=".Settings$AccountDashboardActivity"
-            android:label="@string/account_dashboard_title"
+            android:label="@string/Accounts_settings_title"
             android:exported="true"
             android:icon="@drawable/ic_homepage_accounts">
             <intent-filter android:priority="1">
@@ -4572,6 +4569,12 @@
                       android:host="com.android.settings.backup.transport" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name="com.android.settings.development.OTAProvider"
+            android:authorities="custom.setting.Provider.OTA_SERVER"
+            android:exported="true"
+            android:multiprocess="true" />
 
         <!-- This is the longest AndroidManifest.xml ever. -->
     </application>

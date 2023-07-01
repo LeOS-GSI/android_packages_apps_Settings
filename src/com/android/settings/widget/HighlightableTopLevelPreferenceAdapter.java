@@ -30,7 +30,7 @@ import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceGroupAdapter;
 import androidx.preference.PreferenceViewHolder;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.window.embedding.ActivityEmbeddingController;
+import androidx.window.embedding.SplitController;
 
 import com.android.settings.R;
 import com.android.settings.Utils;
@@ -243,14 +243,9 @@ public class HighlightableTopLevelPreferenceAdapter extends PreferenceGroupAdapt
         v.setBackgroundResource(RES_NORMAL_BACKGROUND);
         ((TextView) v.findViewById(android.R.id.title)).setTextColor(mTitleColorNormal);
         ((TextView) v.findViewById(android.R.id.summary)).setTextColor(mSummaryColorNormal);
-        final Drawable drawable = ((ImageView) v.findViewById(android.R.id.icon)).getDrawable();
-        if (drawable != null) {
-            drawable.setTint(mIconColorNormal);
-        }
     }
 
     private boolean isHighlightNeeded() {
-        return ActivityEmbeddingController.getInstance(mHomepageActivity)
-                .isActivityEmbedded(mHomepageActivity);
+        return SplitController.getInstance().isActivityEmbedded(mHomepageActivity);
     }
 }

@@ -46,7 +46,7 @@
         <item name="wifi_friction">@drawable/wifi_friction</item>
 
         <item name="side_margin">0dp</item>
-        <item name="sudListItemIconColor">?android:attr/colorAccent</item>
+        <item name="sudListItemIconColor">?android:attr/textColorSecondary</item>
 
         <!-- Redefine the ActionBar style for contentInsetStart -->
         <item name="android:actionBarStyle">@style/Widget.ActionBar</item>
@@ -229,7 +229,6 @@
     <!-- Note that Dialog themes do not set list dividers -->
     <style name="Theme.Panel" parent="@*android:style/Theme.DeviceDefault.Settings.Dialog">
         <item name="android:windowBackground">@null</item>
-        <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:dividerHorizontal">@*android:drawable/list_divider_material</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:listDivider">@*android:drawable/list_divider_material</item>

@@ -73,6 +73,7 @@ import java.util.Locale;
         shadows = {
                 AppLocalePickerActivityTest.ShadowApplicationPackageManager.class,
                 AppLocalePickerActivityTest.ShadowResources.class,
+                AppLocalePickerActivityTest.ShadowUserHandle.class,
                 AppLocalePickerActivityTest.ShadowLocaleConfig.class,
         })
 public class AppLocalePickerActivityTest {
@@ -99,6 +100,7 @@ public class AppLocalePickerActivityTest {
         mPackageManager.removePackage(TEST_PACKAGE_NAME);
         ShadowResources.setDisAllowPackage(false);
         ShadowApplicationPackageManager.setNoLaunchEntry(false);
+        ShadowUserHandle.setUserId(0);
         ShadowLocaleConfig.setStatus(LocaleConfig.STATUS_SUCCESS);
     }
 
@@ -154,6 +156,17 @@ public class AppLocalePickerActivityTest {
     @Test
     public void launchAppLocalePickerActivity_appNoLaunchEntry_failed() {
         ShadowApplicationPackageManager.setNoLaunchEntry(true);
+
+        ActivityController<TestAppLocalePickerActivity> controller =
+                initActivityController(true);
+        controller.create();
+
+        assertThat(controller.get().isFinishing()).isTrue();
+    }
+
+    @Test
+    public void launchAppLocalePickerActivity_modifyAppLocalesOfAnotherUser_failed() {
+        ShadowUserHandle.setUserId(10);
 
         ActivityController<TestAppLocalePickerActivity> controller =
                 initActivityController(true);
@@ -270,6 +283,19 @@ public class AppLocalePickerActivityTest {
 
         private static void setDisAllowPackage(boolean disAllowPackage) {
             sDisAllowPackage = disAllowPackage;
+        }
+    }
+
+    @Implements(UserHandle.class)
+    public static class ShadowUserHandle {
+        private static int sUserId = 0;
+        private static void setUserId(int userId) {
+            sUserId = userId;
+        }
+
+        @Implementation
+        public static int getUserId(int userId) {
+            return sUserId;
         }
     }
 

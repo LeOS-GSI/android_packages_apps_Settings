@@ -307,11 +307,10 @@ public class ScreenResolutionFragment extends RadioButtonPickerFragment {
             }
 
             final DisplayDensityUtils density = new DisplayDensityUtils(mContext);
-            final int currentIndex = density.getCurrentIndexForDefaultDisplay();
-            final int defaultDensity = density.getDefaultDensityForDefaultDisplay();
+            final int currentIndex = density.getCurrentIndex();
+            final int defaultDensity = density.getDefaultDensity();
 
-            if (density.getDefaultDisplayDensityValues()[mCurrentIndex]
-                    == density.getDefaultDensityForDefaultDisplay()) {
+            if (density.getValues()[mCurrentIndex] == density.getDefaultDensity()) {
                 return;
             }
 
@@ -352,17 +351,17 @@ public class ScreenResolutionFragment extends RadioButtonPickerFragment {
 
         private void restoreDensity() {
             final DisplayDensityUtils density = new DisplayDensityUtils(mContext);
-            if (density.getDefaultDisplayDensityValues()[mCurrentIndex]
-                    != density.getDefaultDensityForDefaultDisplay()) {
-                density.setForcedDisplayDensity(mCurrentIndex);
+            if (density.getValues()[mCurrentIndex] != density.getDefaultDensity()) {
+                DisplayDensityUtils.setForcedDisplayDensity(
+                        Display.DEFAULT_DISPLAY, density.getValues()[mCurrentIndex]);
             }
 
-            mDefaultDensity = density.getDefaultDensityForDefaultDisplay();
+            mDefaultDensity = density.getDefaultDensity();
         }
 
         private boolean isDensityChanged() {
             final DisplayDensityUtils density = new DisplayDensityUtils(mContext);
-            if (density.getDefaultDensityForDefaultDisplay() == mDefaultDensity) {
+            if (density.getDefaultDensity() == mDefaultDensity) {
                 return false;
             }
 

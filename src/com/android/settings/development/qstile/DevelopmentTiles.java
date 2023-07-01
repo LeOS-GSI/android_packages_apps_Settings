@@ -212,7 +212,6 @@ public abstract class DevelopmentTiles extends TileService {
         static final int SURFACE_FLINGER_LAYER_TRACE_CONTROL_CODE = 1025;
         @VisibleForTesting
         static final int SURFACE_FLINGER_LAYER_TRACE_STATUS_CODE = 1026;
-        private static final String VIEW_CAPTURE_ENABLED = "view_capture_enabled";
         private IBinder mSurfaceFlinger;
         private IWindowManager mWindowManager;
         private ImeTracing mImeTracing;
@@ -280,19 +279,10 @@ public abstract class DevelopmentTiles extends TileService {
             return mImeTracing.isEnabled();
         }
 
-        private boolean isViewCaptureEnabled() {
-            // Add null checking to avoid test case failure.
-            if (getApplicationContext() != null) {
-                return Settings.Global.getInt(getApplicationContext().getContentResolver(),
-                    VIEW_CAPTURE_ENABLED, 0) != 0;
-            }
-            return false;
-        }
-
         @Override
         protected boolean isEnabled() {
             return isWindowTraceEnabled() || isLayerTraceEnabled() || isSystemUiTracingEnabled()
-                    || isImeTraceEnabled() || isViewCaptureEnabled();
+                    || isImeTraceEnabled();
         }
 
         private void setWindowTraceEnabled(boolean isEnabled) {
@@ -350,21 +340,12 @@ public abstract class DevelopmentTiles extends TileService {
             }
         }
 
-        private void setViewCaptureEnabled(boolean isEnabled) {
-            // Add null checking to avoid test case failure.
-            if (getApplicationContext() != null) {
-                Settings.Global.putInt(getApplicationContext()
-                        .getContentResolver(), VIEW_CAPTURE_ENABLED, isEnabled ? 1 : 0);
-            }
-        }
-
         @Override
         protected void setIsEnabled(boolean isEnabled) {
             setWindowTraceEnabled(isEnabled);
             setLayerTraceEnabled(isEnabled);
             setSystemUiTracing(isEnabled);
             setImeTraceEnabled(isEnabled);
-            setViewCaptureEnabled(isEnabled);
             if (!isEnabled) {
                 mToast.show();
             }

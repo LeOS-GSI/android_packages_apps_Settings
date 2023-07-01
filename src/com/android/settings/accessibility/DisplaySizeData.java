@@ -18,7 +18,9 @@ package com.android.settings.accessibility;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.view.Display;
 
+import com.android.settingslib.display.DisplayDensityConfiguration;
 import com.android.settingslib.display.DisplayDensityUtils;
 
 import java.util.Arrays;
@@ -29,13 +31,11 @@ import java.util.stream.Collectors;
  * Data class for storing the configurations related to the display size.
  */
 class DisplaySizeData extends PreviewSizeData<Integer> {
-    private final DisplayDensityUtils mDensity;
-
     DisplaySizeData(Context context) {
         super(context);
 
-        mDensity = new DisplayDensityUtils(getContext());
-        final int initialIndex = mDensity.getCurrentIndexForDefaultDisplay();
+        final DisplayDensityUtils density = new DisplayDensityUtils(getContext());
+        final int initialIndex = density.getCurrentIndex();
         if (initialIndex < 0) {
             // Failed to obtain default density, which means we failed to
             // connect to the window manager service. Just use the current
@@ -46,10 +46,9 @@ class DisplaySizeData extends PreviewSizeData<Integer> {
             setInitialIndex(0);
             setValues(Collections.singletonList(densityDpi));
         } else {
-            setDefaultValue(mDensity.getDefaultDensityForDefaultDisplay());
+            setDefaultValue(density.getDefaultDensity());
             setInitialIndex(initialIndex);
-            setValues(Arrays.stream(mDensity.getDefaultDisplayDensityValues()).boxed()
-                    .collect(Collectors.toList()));
+            setValues(Arrays.stream(density.getValues()).boxed().collect(Collectors.toList()));
         }
     }
 
@@ -57,9 +56,10 @@ class DisplaySizeData extends PreviewSizeData<Integer> {
     void commit(int currentProgress) {
         final int densityDpi = getValues().get(currentProgress);
         if (densityDpi == getDefaultValue()) {
-            mDensity.clearForcedDisplayDensity();
+            DisplayDensityConfiguration.clearForcedDisplayDensity(Display.DEFAULT_DISPLAY);
         } else {
-            mDensity.setForcedDisplayDensity(currentProgress);
+            DisplayDensityConfiguration.setForcedDisplayDensity(Display.DEFAULT_DISPLAY,
+                    densityDpi);
         }
     }
 }

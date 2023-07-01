@@ -213,11 +213,10 @@ public class ChooseLockPattern extends SettingsActivity {
         protected LockPatternView mLockPatternView;
         protected TextView mFooterText;
         protected FooterButton mSkipOrClearButton;
-        protected FooterButton mNextButton;
+        private FooterButton mNextButton;
         @VisibleForTesting protected LockscreenCredential mChosenPattern;
         private byte mPatternSize = LockPatternUtils.PATTERN_SIZE_DEFAULT;
         private ColorStateList mDefaultHeaderColorList;
-        private View mSudContent;
 
         /**
          * The patten used during the help screen to show how to draw a pattern.
@@ -365,34 +364,31 @@ public class ChooseLockPattern extends SettingsActivity {
 
             Introduction(
                     R.string.lock_settings_picker_biometrics_added_security_message,
-                    R.string.lockpassword_choose_your_pattern_description,
+                    R.string.lockpattern_recording_intro_header,
                     LeftButtonMode.Gone, RightButtonMode.ContinueDisabled,
                     ID_EMPTY_MESSAGE, true),
             HelpScreen(
-                    R.string.lockpattern_settings_help_how_to_record,
-                    R.string.lockpattern_settings_help_how_to_record,
+                    ID_EMPTY_MESSAGE, R.string.lockpattern_settings_help_how_to_record,
                     LeftButtonMode.Gone, RightButtonMode.Ok, ID_EMPTY_MESSAGE, false),
             ChoiceTooShort(
-                    R.string.lockpattern_recording_incorrect_too_short,
+                    R.string.lock_settings_picker_biometrics_added_security_message,
                     R.string.lockpattern_recording_incorrect_too_short,
                     LeftButtonMode.Retry, RightButtonMode.ContinueDisabled,
                     ID_EMPTY_MESSAGE, true),
             FirstChoiceValid(
-                    R.string.lockpattern_pattern_entered_header,
+                    R.string.lock_settings_picker_biometrics_added_security_message,
                     R.string.lockpattern_pattern_entered_header,
                     LeftButtonMode.Retry, RightButtonMode.Continue, ID_EMPTY_MESSAGE, false),
             NeedToConfirm(
-                    R.string.lockpattern_need_to_confirm, R.string.lockpattern_need_to_confirm,
+                    ID_EMPTY_MESSAGE, R.string.lockpattern_need_to_confirm,
                     LeftButtonMode.Gone, RightButtonMode.ConfirmDisabled,
                     ID_EMPTY_MESSAGE, true),
             ConfirmWrong(
-                    R.string.lockpattern_need_to_unlock_wrong,
-                    R.string.lockpattern_need_to_unlock_wrong,
+                    ID_EMPTY_MESSAGE, R.string.lockpattern_need_to_unlock_wrong,
                     LeftButtonMode.Gone, RightButtonMode.ConfirmDisabled,
                     ID_EMPTY_MESSAGE, true),
             ChoiceConfirmed(
-                    R.string.lockpattern_pattern_confirmed_header,
-                    R.string.lockpattern_pattern_confirmed_header,
+                    ID_EMPTY_MESSAGE, R.string.lockpattern_pattern_confirmed_header,
                     LeftButtonMode.Gone, RightButtonMode.Confirm, ID_EMPTY_MESSAGE, false);
 
 
@@ -538,10 +534,6 @@ public class ChooseLockPattern extends SettingsActivity {
             );
             mSkipOrClearButton = mixin.getSecondaryButton();
             mNextButton = mixin.getPrimaryButton();
-            // TODO(b/243008023) Workaround for Glif layout on 2 panel choose lock settings.
-            mSudContent = layout.findViewById(R.id.sud_layout_content);
-            mSudContent.setPadding(mSudContent.getPaddingLeft(), 0, mSudContent.getPaddingRight(),
-                    0);
 
             mPatternSize = getActivity().getIntent().getByteExtra("pattern_size",
                     LockPatternUtils.PATTERN_SIZE_DEFAULT);
@@ -559,9 +551,7 @@ public class ChooseLockPattern extends SettingsActivity {
         @Override
         public void onViewCreated(View view, Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
-            final GlifLayout layout = getActivity().findViewById(R.id.setup_wizard_layout);
-            mHeaderText = layout.getDescriptionTextView();
-            mHeaderText.setMinLines(2);
+            mHeaderText = (TextView) view.findViewById(R.id.headerText);
             mDefaultHeaderColorList = mHeaderText.getTextColors();
             mLockPatternView = (LockPatternView) view.findViewById(R.id.lockPattern);
             mLockPatternView.setOnPatternListener(mChooseNewLockPatternListener);
@@ -741,24 +731,30 @@ public class ChooseLockPattern extends SettingsActivity {
          */
         protected void updateStage(Stage stage) {
             final Stage previousStage = mUiStage;
-            final GlifLayout layout = getActivity().findViewById(R.id.setup_wizard_layout);
-            mUiStage = stage;
 
-            if (stage == Stage.Introduction) {
-                layout.setDescriptionText(stage.headerMessage);
-            }
+            mUiStage = stage;
 
             // header text, footer text, visibility and
             // enabled state all known from the stage
             if (stage == Stage.ChoiceTooShort) {
-                layout.setDescriptionText(
+                mHeaderText.setText(
                         getResources().getString(
                                 stage.headerMessage,
                                 LockPatternUtils.MIN_LOCK_PATTERN_SIZE));
             } else {
-                layout.setDescriptionText(stage.headerMessage);
+                mHeaderText.setText(stage.headerMessage);
             }
-
+            final GlifLayout layout = getActivity().findViewById(R.id.setup_wizard_layout);
+            final boolean forAnyBiometric = mForFingerprint || mForFace || mForBiometrics;
+            if (forAnyBiometric) {
+                if (stage.messageForBiometrics == ID_EMPTY_MESSAGE) {
+                    layout.setDescriptionText("");
+                } else {
+                    layout.setDescriptionText(stage.messageForBiometrics);
+                }
+            } else {
+                layout.getDescriptionTextView().setVisibility(View.GONE);
+            }
             if (stage.footerMessage == ID_EMPTY_MESSAGE) {
                 mFooterText.setText("");
             } else {
@@ -776,8 +772,8 @@ public class ChooseLockPattern extends SettingsActivity {
                     mHeaderText.setTextColor(mDefaultHeaderColorList);
                 }
 
-                if (stage == Stage.NeedToConfirm) {
-                    mHeaderText.setText(stage.headerMessage);
+                if (stage == Stage.NeedToConfirm && forAnyBiometric) {
+                    mHeaderText.setText("");
                     layout.setHeaderText(R.string.lockpassword_draw_your_pattern_again_header);
                 }
             }
@@ -807,7 +803,6 @@ public class ChooseLockPattern extends SettingsActivity {
                     mLockPatternView.setPattern(DisplayMode.Animate, mAnimatePattern);
                     break;
                 case ChoiceTooShort:
-                case ConfirmWrong:
                     mLockPatternView.setDisplayMode(DisplayMode.Wrong);
                     postClearPatternRunnable();
                     announceAlways = true;
@@ -816,6 +811,11 @@ public class ChooseLockPattern extends SettingsActivity {
                     break;
                 case NeedToConfirm:
                     mLockPatternView.clearPattern();
+                    break;
+                case ConfirmWrong:
+                    mLockPatternView.setDisplayMode(DisplayMode.Wrong);
+                    postClearPatternRunnable();
+                    announceAlways = true;
                     break;
                 case ChoiceConfirmed:
                     break;

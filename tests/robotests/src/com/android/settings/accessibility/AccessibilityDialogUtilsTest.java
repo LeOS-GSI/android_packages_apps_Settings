@@ -43,20 +43,20 @@ public class AccessibilityDialogUtilsTest {
     }
 
     @Test
-    public void updateShortcutInDialog_correctDialogType_success() {
+    public void updateSoftwareShortcutInDialog_correctDialogType_success() {
         final AlertDialog dialog = AccessibilityDialogUtils.showEditShortcutDialog(
                 mContext, AccessibilityDialogUtils.DialogType.EDIT_SHORTCUT_GENERIC, "Title",
                 null);
 
         assertThat(
-                AccessibilityDialogUtils.updateShortcutInDialog(mContext, dialog)).isTrue();
+                AccessibilityDialogUtils.updateSoftwareShortcutInDialog(mContext, dialog)).isTrue();
     }
 
     @Test
-    public void updateShortcutInDialog_useNotSupportedDialog_fail() {
+    public void updateSoftwareShortcutInDialog_useNotSupportedDialog_fail() {
         final AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("Title").show();
 
-        assertThat(AccessibilityDialogUtils.updateShortcutInDialog(mContext,
+        assertThat(AccessibilityDialogUtils.updateSoftwareShortcutInDialog(mContext,
                 dialog)).isFalse();
     }
 
