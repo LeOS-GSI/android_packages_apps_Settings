@@ -704,7 +704,10 @@
     <!-- Text shown for title of settings checkbox to enable widgets [CHAR LIMIT=20]-->
     <string name="security_enable_widgets_title">Enable widgets</string>
     <!-- Summary for settings checkbox to disable widgets when the setting has been disabled by an installed device admin [CHAR LIMIT=50] -->
+
     <string name="security_enable_widgets_disabled_summary">Disabled by admin</string>
+    <string name="hosts_disable_title">Disable DNS content blocker</string>
+    <string name="hosts_disable_summary">Disables use of the included /etc/hosts database for data collection and malware blocking.</string>
 
     <!-- Text shown for the title of the lock when trust lost option [CHAR LIMIT=40] -->
     <string name="trust_lost_locks_screen_title">Lock screen when trust is lost</string>
@@ -14459,5 +14462,8 @@
     <string name="bt_le_audio_scan_qr_code_scanner">To start listening, center the QR code below</string>
     <!-- [CHAR LIMIT=NONE] Hint for QR code process failure -->
     <string name="bt_le_audio_qr_code_is_not_valid_format">QR code isn\u0027t a valid format</string>
+
+    <string name="connectivity_check_title">Internet connectivity check</string>
+    <string name="connectivity_check_summary">HTTP endpoints to use for performing internet connectivity checks.</string>
 
 </resources>
